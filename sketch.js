@@ -177,6 +177,7 @@ function setup() {
   botonParticulas = select('.boton-particulas');
 
   botonGrabar.mousePressed(() => {
+    activarContextoAudio();
     fondoBlanco = !fondoBlanco;
   });
 
@@ -186,11 +187,13 @@ function setup() {
   });
 
   botonAcordes.mousePressed(() => {
+    activarContextoAudio();
     modo = 'acordes';
     apagarOsciladores();
   });
 
   botonParticulas.mousePressed(() => {
+   activarContextoAudio();
     modo = 'particulas';
     apagarOsciladores();
   });
@@ -206,12 +209,7 @@ function draw() {
     image(interfaz, 0, 0, width, height);
     image(plano, 0, 0, width, height);
   }
-function activarContextoAudio() {
-  if (!contextoAudioActivado) {
-    getAudioContext().resume();
-    contextoAudioActivado = true;
-  }
-}
+
   dibujarGuias();
   
   push();
@@ -277,6 +275,13 @@ function activarContextoAudio() {
 }
 
 function mousePressed() { if (touches.length === 0) mouseTouchActivo = !mouseTouchActivo; }
+
+function activarContextoAudio() {
+  if (!contextoAudioActivado) {
+    getAudioContext().resume();
+    contextoAudioActivado = true;
+  }
+}
 
 // ------------------- FUNCIONES AUX -------------------
 function activarOscilador(oscilador, frecuencia, volumen = 0.5) {
