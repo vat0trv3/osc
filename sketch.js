@@ -253,6 +253,11 @@ function draw() {
 function mousePressed() { if (touches.length === 0) mouseTouchActivo = !mouseTouchActivo; }
 
 // ------------------- FUNCIONES AUX -------------------
+function activarOscilador(oscilador, frecuencia, volumen = 0.5) {
+  oscilador.freq(frecuencia, 0.01);   // cambio casi inmediato
+  oscilador.amp(volumen, 0.05);       // ataque corto
+}
+
 function manejarParticulas(points, oscilador) {
   while (particleSystems.length < points.length) particleSystems.push(new ParticleSystem());
   while (particleSystems.length > points.length) particleSystems.pop();
@@ -264,7 +269,7 @@ function manejarParticulas(points, oscilador) {
     ps.addParticle(); 
     ps.run();
 
-    if (frameCount % 5 === 0) {
+    if (modo === 'particulas' && frameCount % 5 === 0) {
       let nextLetter = phrase.charAt(phraseIndex);
       letterParticles.push(new Molecula(t.x, t.y, nextLetter));
       phraseIndex = (phraseIndex + 1) % phrase.length;
@@ -273,23 +278,13 @@ function manejarParticulas(points, oscilador) {
     if (oscilador) {
       let resultado = getEscalaPorSlice(t);
       if (resultado) {
-        if (!contextoAudioActivado) { oscilador.start(); oscilador.amp(0.5); contextoAudioActivado = true; }
-        oscilador.freq(resultado.frecuencia, 0.4);
+        activarOscilador(oscilador, resultado.frecuencia);
       }
     }
   }
-  if (oscilador) {
-    let vol = 0.5;
-    let attackTime = 0.05;
-    if (waveTypes[currentWaveIndex] === 'saw') {
-      vol = 0.3;
-      attackTime = 1.0;
-    }
-    if (points.length === 0) {
-      oscilador.amp(0, 0.05);
-    } else {
-      oscilador.amp(vol, attackTime);
-    }
+
+  if (oscilador && points.length === 0) {
+    oscilador.amp(0, 0.05); // apagar suave
   }
 }
 
@@ -310,16 +305,16 @@ function manejarMoleculas(points, oscilador) {
     if (oscilador) {
       let resultado = getEscalaPorSlice(t);
       if (resultado) {
-        if (!contextoAudioActivado) { oscilador.start(); oscilador.amp(0.5); contextoAudioActivado = true; }
-        oscilador.freq(resultado.frecuencia, 0.4);
+        activarOscilador(oscilador, resultado.frecuencia);
       }
     }
   }
-  if (oscilador) {
-    if (points.length === 0) oscilador.amp(0, 0.05);
-    else oscilador.amp(0.5, 0.05);
+
+  if (oscilador && points.length === 0) {
+    oscilador.amp(0, 0.05);
   }
 }
+
 
 function apagarOsciladores() {
   osciladorSonido.amp(0, 0.05);
