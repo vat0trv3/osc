@@ -205,10 +205,21 @@ function draw() {
     background(colors.black);
   }
   
-  if (!fondoBlanco) {
-    image(interfaz, 0, 0, width, height);
-    image(plano, 0, 0, width, height);
-  }
+  
+// Mostrar interfaz solo en fondo oscuro
+if (!fondoBlanco) {
+  image(interfaz, 0, 0, width, height);
+}
+
+// Mostrar plano siempre, con tint adaptado
+push();
+if (fondoBlanco) {
+  tint(255, 0, 255, 255); // tono oscuro para fondo claro
+} else {
+  tint(255, 0, 255, 80); // tono claro para fondo oscuro
+}
+image(plano, 0, 0, width, height);
+pop();
 
   dibujarGuias();
   
