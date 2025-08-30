@@ -15,6 +15,10 @@ let letterParticles = [];
 
 let notaX, notaY;
 
+function noCanvasScroll() {
+  document.body.style.overflow = 'hidden';
+}
+
 // Botones HTML
 let botonGrabar, botonBack, botonAcordes, botonParticulas;
 
@@ -34,31 +38,38 @@ const colors = {
 };
 
 // ------------------- CLASES -------------------
+
 class Particle {
   constructor(x, y) {
     this.pos = createVector(x, y);
-    this.vel = p5.Vector.random2D().mult(random(0.1, 3));
+    this.vel = p5.Vector.random2D().mult(random(0.5, 2));
     this.acc = createVector(0, 0);
     this.lifespan = 255;
-    this.r = random(1, 2);
+    this.r = random(4, 8); // más grandes
   }
+
   update() {
-    this.vel.rotate(.05);
+    this.vel.rotate(0.01); // rotación más suave
     this.vel.add(this.acc);
     this.pos.add(this.vel);
-    this.lifespan -= .63;
+    this.lifespan -= 1.2; // se desvanecen más rápido
   }
+
   display() {
     if (fondoBlanco) {
-      fill(0, 0, 0, this.lifespan);
+      fill(0, this.lifespan);
     } else {
-      fill(255, 255, 255, this.lifespan);
+      fill(255, this.lifespan);
     }
     noStroke();
     ellipse(this.pos.x, this.pos.y, this.r);
   }
-  isDead() { return this.lifespan < 0; }
+
+  isDead() {
+    return this.lifespan < 0;
+  }
 }
+
 
 class ParticleSystem {
   constructor() {
@@ -86,6 +97,11 @@ class ParticleSystem {
           line(this.particles[i].pos.x, this.particles[i].pos.y,
             this.particles[j].pos.x, this.particles[j].pos.y);
         }
+const maxParticles = 100;
+if (this.particles.length > maxParticles) {
+  this.particles.splice(0, this.particles.length - maxParticles);
+}
+
       }
     }
   }
@@ -140,14 +156,20 @@ function preload() {
   interfaz = loadImage("fondonegro.png");
   plano = loadImage("assets/4f.png");
 }
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
   notaX = width - 60;
   notaY = 60;
 
-  osciladorSonido = new p5.Oscillator('sine'); osciladorSonido.amp(0); osciladorSonido.start();
-  osciladorMoleculas = new p5.Oscillator('triangle'); osciladorMoleculas.amp(0); osciladorMoleculas.start();
+  noCanvasScroll(); // 👈 evita scroll en móviles
+
+  osciladorSonido = new p5.Oscillator('sine');
+  osciladorSonido.amp(0);
+  osciladorSonido.start();
+
+  osciladorMoleculas = new p5.Oscillator('triangle');
+  osciladorMoleculas.amp(0);
+  osciladorMoleculas.start();
 
   botonGrabar = select('.boton-grabar');
   botonBack = select('.boton-back');
@@ -173,7 +195,6 @@ function setup() {
     apagarOsciladores();
   });
 }
-
 function draw() {
   if (fondoBlanco) {
     background(colors.white);
