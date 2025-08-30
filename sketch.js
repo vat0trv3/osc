@@ -206,7 +206,12 @@ function draw() {
     image(interfaz, 0, 0, width, height);
     image(plano, 0, 0, width, height);
   }
-
+function activarContextoAudio() {
+  if (!contextoAudioActivado) {
+    getAudioContext().resume();
+    contextoAudioActivado = true;
+  }
+}
   dibujarGuias();
   
   push();
