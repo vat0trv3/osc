@@ -1,3 +1,4 @@
+
 window.addEventListener('DOMContentLoaded', () => {
   // Crear menú
   const menuContainer = document.createElement('div');
