@@ -1,20 +1,36 @@
+let drumLoops = [];
+let currentLoop = -1;
+let drumBtn;
 let interfaz, plano;
+
+// Sistemas visuales
 let particleSystems = [];
 let moleculaSystems = [];
-let modo = 'sonido';
+let letterParticles = [];
+
+// Texto dinámico
+let phrase = "VAVATOTOTRATRAVAVEVE";
+let phraseIndex = 0;
+
+// Osciladores / Audio
+let modo = 'sonido'; // "sonido" o "moleculas"
 let osciladorSonido, osciladorMoleculas;
 let contextoAudioActivado = false;
 let waveTypes = ['sine', 'triangle', 'square', 'saw'];
 let currentWaveIndex = 0;
 
+// Interacción mouse/touch
 let mouseTouchActivo = false;
 let mouseTouchPos = { x: 0, y: 0 };
-let phrase = "VAVATOTOTRATRAVAVEVE";
-let phraseIndex = 0;
-let letterParticles = [];
 
+// Notas y posiciones
 let notaX, notaY;
 
+// Parámetros editables (para el menú)
+let tempo = 111;                  // BPM
+let idioma = "ES";                // Idioma (ejemplo: "ES", "EN")
+let temaVisual = "oscuro";        // Tema de colores
+let acordesPorColumna = ["Em", "Am", "Dm", "Bm"];
 function noCanvasScroll() {
   document.body.style.overflow = 'hidden';
 }
@@ -155,11 +171,28 @@ class MoleculaSystem {
 function preload() {
   interfaz = loadImage("fondonegro.png");
   plano = loadImage("assets/4f.png");
+  soundFormats('mp3', 'wav'); // por si usas .wav después
+  drumLoops[0] = loadSound('assets/audio/KesiKenobyvattdrumsversioncorta.wav');
+  drumLoops[1] = loadSound('assets/audio/KesiKenobyvattdrumsversioncorta.wav');
+  drumLoops[2] = loadSound('assets/audio/KesiKenobyvattdrumsversioncorta.wav');
 }
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  notaX = width - 60;
-  notaY = 60;
+  let canvas = createCanvas(windowWidth, windowHeight);
+canvas.position(0, 0);
+canvas.style('z-index', '0');
+  drumBtn = createButton('🥁 Drum Loop');
+  drumBtn.position(20, height - 70); // abajo a la izquierda
+  drumBtn.size(120, 40);
+  drumBtn.style('font-size', '16px');
+  drumBtn.style('background-color', '#222');
+  drumBtn.style('color', 'white');
+  drumBtn.style('border', 'none');
+  drumBtn.style('border-radius', '8px');
+  drumBtn.style('cursor', 'pointer');
+  drumBtn.mousePressed(toggleDrumLoop);
+
+notaX = width - 60;
+notaY = 60;
 
   noCanvasScroll(); // 👈 evita scroll en móviles
 
@@ -199,13 +232,11 @@ function setup() {
   });
 }
 function draw() {
-  if (fondoBlanco) {
-    background(colors.white);
-  } else {
-    background(colors.black);
-  }
-  
-  
+  if (fondoBlanco); 
+    background(fondoBlanco ? colors.white : colors.black);
+
+  // ... lo que ya tienes ...
+  dibujarTablero();
 // Mostrar interfaz solo en fondo oscuro
 if (!fondoBlanco) {
   image(interfaz, 0, 0, width, height);
@@ -273,7 +304,16 @@ pop();
       }
     }
   }
+function toggleDrumLoop() {
+  // Detener loop actual si hay uno
+  if (currentLoop !== -1 && drumLoops[currentLoop].isPlaying()) {
+    drumLoops[currentLoop].stop();
+  }
 
+  // Avanzar al siguiente loop
+  currentLoop = (currentLoop + 1) % drumLoops.length;
+  drumLoops[currentLoop].loop();
+}
   push();
   noStroke();
   if(fondoBlanco){
@@ -392,6 +432,41 @@ function getEscalaPorSlice(puntoToque) {
   indice = constrain(indice, 0, notas.length - 1);
 
   return { escala: escalaSeleccionada, frecuencia: notas[indice] };
+}
+function dibujarTablero() {
+  push();
+  noStroke();
+
+  // Fondo negro mate del área táctil
+  fill(20, 20, 20, 200); // semi-transparente
+  rect(0, height * 0.2, width, height * 0.8);
+
+  // Columnas separadas
+  let anchoColumna = width / 4;
+  for (let i = 0; i < 4; i++) {
+    let x = i * anchoColumna;
+
+    // Si hay toque en esta columna, iluminar
+    let activo = false;
+    for (let p of touches) {
+      if (p.x > x && p.x < x + anchoColumna) activo = true;
+    }
+    if (mouseTouchActivo &&
+        mouseTouchPos.x > x && mouseTouchPos.x < x + anchoColumna) {
+      activo = true;
+    }
+
+    if (activo) {
+      fill(255, 0, 200, 40); // iluminación sutil
+      rect(x, height * 0.2, anchoColumna, height * 0.8);
+    }
+
+    // Líneas divisorias
+    stroke(255, 40);
+    strokeWeight(1);
+    line(x, height * 0.2, x, height);
+  }
+  pop();
 }
 
 function dibujarGuias() {
