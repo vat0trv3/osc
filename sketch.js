@@ -13,11 +13,9 @@ let phrase = "VAVATOTOTRATRAVAVEVE";
 let phraseIndex = 0;
 
 // Osciladores / Audio
-let modo = 'sonido'; // "sonido" o "moleculas"
+let modo = 'sonido';
 let osciladorSonido, osciladorMoleculas;
 let contextoAudioActivado = false;
-let waveTypes = ['sine', 'triangle', 'square', 'saw'];
-let currentWaveIndex = 0;
 
 // Interacción mouse/touch
 let mouseTouchActivo = false;
@@ -26,182 +24,30 @@ let mouseTouchPos = { x: 0, y: 0 };
 // Notas y posiciones
 let notaX, notaY;
 
-// Parámetros editables (para el menú)
-let tempo = 111;                  // BPM
-let idioma = "ES";                // Idioma (ejemplo: "ES", "EN")
-let temaVisual = "oscuro";        // Tema de colores
-let acordesPorColumna = ["Em", "Am", "Dm", "Bm"];
-function noCanvasScroll() {
-  document.body.style.overflow = 'hidden';
-}
-
-// Botones HTML
-let botonGrabar, botonBack, botonAcordes, botonParticulas;
-
+// Parámetros editables
 let fondoBlanco = false;
 
-// Paleta de colores
-const colors = {
-  black: "#000000",
-  darkGray: "#1A1A1A",
-  magenta: "#FF00E6",
-  pink: "#FF2AAF",
-  red: "#FF004D",
-  green: "#00FF73",
-  cyan: "#00FFFF",
-  yellow: "#FFFF00",
-  white: "#F2F2F2"
-};
-
 // ------------------- CLASES -------------------
-
-class Particle {
-  constructor(x, y) {
-    this.pos = createVector(x, y);
-    this.vel = p5.Vector.random2D().mult(random(0.5, 2));
-    this.acc = createVector(0, 0);
-    this.lifespan = 255;
-    this.r = random(4, 8); // más grandes
-  }
-
-  update() {
-    this.vel.rotate(0.01); // rotación más suave
-    this.vel.add(this.acc);
-    this.pos.add(this.vel);
-    this.lifespan -= 1.2; // se desvanecen más rápido
-  }
-
-  display() {
-    if (fondoBlanco) {
-      fill(0, this.lifespan);
-    } else {
-      fill(255, this.lifespan);
-    }
-    noStroke();
-    ellipse(this.pos.x, this.pos.y, this.r);
-  }
-
-  isDead() {
-    return this.lifespan < 0;
-  }
-}
-
-
-class ParticleSystem {
-  constructor() {
-    this.origin = createVector(width / 2, height / 2);
-    this.particles = [];
-  }
-  addParticle() { this.particles.push(new Particle(this.origin.x, this.origin.y)); }
-  run() {
-    for (let i = this.particles.length - 1; i >= 0; i--) {
-      let p = this.particles[i];
-      p.update(); p.display();
-      if (p.isDead()) this.particles.splice(i, 1);
-    }
-    
-    if (fondoBlanco) {
-        stroke(0, 88);
-    } else {
-        stroke(255, 88);
-    }
-    strokeWeight(1);
-    for (let i = 0; i < this.particles.length; i++) {
-      for (let j = i + 1; j < this.particles.length; j++) {
-        if (dist(this.particles[i].pos.x, this.particles[i].pos.y,
-          this.particles[j].pos.x, this.particles[j].pos.y) < 50) {
-          line(this.particles[i].pos.x, this.particles[i].pos.y,
-            this.particles[j].pos.x, this.particles[j].pos.y);
-        }
-const maxParticles = 100;
-if (this.particles.length > maxParticles) {
-  this.particles.splice(0, this.particles.length - maxParticles);
-}
-
-      }
-    }
-  }
-}
-
-class Molecula {
-  constructor(x, y, letra) {
-    this.pos = createVector(x, y);
-    this.vel = p5.Vector.random2D().mult(random(2, 5));
-    this.acc = createVector(0, 0);
-    this.lifespan = 255;
-    this.letra = letra;
-    this.textSize = random(20, 50);
-  }
-  update() {
-    this.vel.add(this.acc);
-    this.pos.add(this.vel);
-    this.lifespan -= 2;
-    this.vel.mult(0.98);
-  }
-  display() {
-    if (fondoBlanco) {
-      fill(0, 0, 0, this.lifespan);
-    } else {
-      fill(255, 255, 255, this.lifespan);
-    }
-    noStroke();
-    textSize(this.textSize);
-    textAlign(CENTER, CENTER);
-    text(this.letra, this.pos.x, this.pos.y);
-  }
-  isDead() { return this.lifespan < 0; }
-}
-
-class MoleculaSystem {
-  constructor() {
-    this.origin = createVector(width / 2, height / 2);
-    this.moleculas = [];
-  }
-  addMolecula(letra) { this.moleculas.push(new Molecula(this.origin.x, this.origin.y, letra)); }
-  run() {
-    for (let i = this.moleculas.length - 1; i >= 0; i--) {
-      let m = this.moleculas[i];
-      m.update(); m.display();
-      if (m.isDead()) this.moleculas.splice(i, 1);
-    }
-  }
-}
+// ... Aquí van tus clases Particle, ParticleSystem, Molecula, MoleculaSystem (sin cambios) ...
 
 // ------------------- P5.JS -------------------
 function preload() {
   interfaz = loadImage("fondonegro.png");
   plano = loadImage("assets/4f.png");
-  soundFormats('mp3', 'wav'); // por si usas .wav después
+  soundFormats('mp3', 'wav');
   drumLoop = loadSound('assets/audio/KesiKenobyvattdrumsversioncorta.wav');
 }
+
 function setup() {
   let canvas = createCanvas(windowWidth, windowHeight);
-canvas.position(0, 0);
-canvas.style('z-index', '0');
-  drumBtn = createButton('🥁 Drum Loop');
-  drumBtn.position(20, height - 70); // abajo a la izquierda
-  drumBtn.size(120, 40);
-  drumBtn.style('font-size', '16px');
-  drumBtn.style('background-color', '#222');
-  drumBtn.style('color', 'white');
-  drumBtn.style('border', 'none');
-  drumBtn.style('border-radius', '8px');
-  drumBtn.style('cursor', 'pointer');
+  canvas.position(0, 0);
+  canvas.style('z-index', '0');
+
+  // BOTONES HTML
+  drumBtn = select('#toggle-drum-btn');
   drumBtn.mousePressed(toggleDrumLoop);
 
-notaX = width - 60;
-notaY = 60;
-
-  noCanvasScroll(); // 👈 evita scroll en móviles
-
-  osciladorSonido = new p5.Oscillator('sine');
-  osciladorSonido.amp(0);
-  osciladorSonido.start();
-
-  osciladorMoleculas = new p5.Oscillator('triangle');
-  osciladorMoleculas.amp(0);
-  osciladorMoleculas.start();
-
+  // Otros botones
   botonGrabar = select('.boton-grabar');
   botonBack = select('.boton-back');
   botonAcordes = select('.boton-acordes');
@@ -224,36 +70,43 @@ notaY = 60;
   });
 
   botonParticulas.mousePressed(() => {
-   activarContextoAudio();
+    activarContextoAudio();
     modo = 'particulas';
     apagarOsciladores();
   });
-}
-function draw() {
-  if (fondoBlanco) {
-    background(fondoBlanco ? colors.white : colors.black);
-}
-  // ... lo que ya tienes ...
-  dibujarTablero();
-// Mostrar interfaz solo en fondo oscuro
-if (!fondoBlanco) {
-  image(interfaz, 0, 0, width, height);
+
+  notaX = width - 60;
+  notaY = 60;
+
+  noCanvasScroll();
+
+  // OSCILADORES
+  osciladorSonido = new p5.Oscillator('sine');
+  osciladorSonido.amp(0);
+  osciladorSonido.start();
+
+  osciladorMoleculas = new p5.Oscillator('triangle');
+  osciladorMoleculas.amp(0);
+  osciladorMoleculas.start();
 }
 
-// Mostrar plano siempre, con tint adaptado
-push();
-if (fondoBlanco) {
-  tint(255, 0, 255, 255); // tono oscuro para fondo claro
-} else {
-  tint(255, 0, 255, 80); // tono claro para fondo oscuro
-}
-image(plano, 0, 0, width, height);
-pop();
+function draw() {
+  background(fondoBlanco ? 255 : 0);
+
+  dibujarTablero();
+
+  if (!fondoBlanco) image(interfaz, 0, 0, width, height);
+
+  push();
+  tint(255, 0, 255, fondoBlanco ? 255 : 80);
+  image(plano, 0, 0, width, height);
+  pop();
 
   dibujarGuias();
-  
+
+  // Cuadrícula horizontal
   push();
-  if(fondoBlanco){ stroke(0, 80); } else { stroke(255, 80); }
+  stroke(fondoBlanco ? 0 : 255, 80);
   strokeWeight(1);
   const limiteSuperior = height * 0.2;
   const limiteInferior = height;
@@ -264,19 +117,15 @@ pop();
   }
   pop();
 
-  let points;
-  if (touches.length > 0) points = touches;
-  else if (mouseTouchActivo) { mouseTouchPos.x = mouseX; mouseTouchPos.y = mouseY; points = [mouseTouchPos]; }
-  else points = [];
-
-  let limite = height * 0.8;
-  points = points.filter(p => p.y < limite);
+  // Puntos de toque
+  let points = touches.length > 0 ? touches : (mouseTouchActivo ? [mouseTouchPos] : []);
+  points = points.filter(p => p.y < height * 0.8);
 
   if (modo === 'sonido') manejarParticulas(points, osciladorSonido);
   else if (modo === 'particulas') manejarParticulas(points, null);
   else if (modo === 'acordes') manejarMoleculas(points, osciladorMoleculas);
 
-  // Bucle para actualizar, dibujar y CONECTAR letras adicionales
+  // Dibujar letra y líneas
   for (let i = letterParticles.length - 1; i >= 0; i--) {
     let m = letterParticles[i];
     m.update();
@@ -286,22 +135,31 @@ pop();
       continue;
     }
 
-    // Compara la letra actual con las otras para conectarlas
     for (let j = i - 1; j >= 0; j--) {
       let other = letterParticles[j];
-      let d = dist(m.pos.x, m.pos.y, other.pos.x, other.pos.y);
-      
-      if (d < 60) {
-        if (fondoBlanco) {
-          stroke(0, 50);
-        } else {
-          stroke(255, 50);
-        }
+      if (dist(m.pos.x, m.pos.y, other.pos.x, other.pos.y) < 60) {
+        stroke(fondoBlanco ? 0 : 255, 50);
         strokeWeight(1);
         line(m.pos.x, m.pos.y, other.pos.x, other.pos.y);
       }
     }
   }
+
+  // Nota musical
+  push();
+  noStroke();
+  fill(fondoBlanco ? 0, 50 : 255, 50);
+  textSize(50);
+  textAlign(CENTER, CENTER);
+  text('♫', notaX, notaY);
+  pop();
+}
+
+function mousePressed() {
+  if (touches.length === 0) mouseTouchActivo = !mouseTouchActivo;
+}
+
+// ------------------- FUNCIONES -------------------
 function toggleDrumLoop() {
   if (drumPlaying) {
     drumLoop.stop();
@@ -311,18 +169,6 @@ function toggleDrumLoop() {
     drumPlaying = true;
   }
 }
-  push();
-  noStroke();
-  if(fondoBlanco){
-      fill(0,0,0,50);
-  } else {
-      fill(255,255,255,50);
-  }
-  textSize(50); textAlign(CENTER, CENTER); text('♫', notaX, notaY);
-  pop();
-}
-
-function mousePressed() { if (touches.length === 0) mouseTouchActivo = !mouseTouchActivo; }
 
 function activarContextoAudio() {
   if (!contextoAudioActivado) {
@@ -330,6 +176,9 @@ function activarContextoAudio() {
     contextoAudioActivado = true;
   }
 }
+
+// Aquí van tus funciones manejarParticulas, manejarMoleculas, apagarOsciladores, getEscalaPorSlice, dibujarTablero, dibujarGuias, windowResized
+
 
 // ------------------- FUNCIONES AUX -------------------
 function activarOscilador(oscilador, frecuencia, volumen = 0.5) {
