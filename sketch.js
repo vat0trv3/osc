@@ -140,7 +140,7 @@ class MoleculaSystem {
 function preload() {
   interfaz = loadImage("fondonegro.png");
   plano = loadImage("assets/4f.png");
-  drumLoop = loadSound('assets/drumloop.mp3'); // Ruta correcta
+  drumLoop = loadSound('assets/audio/KesiKenobyvattdrumsversioncorta.wav'); // Ruta correcta
 }
 
 function setup() {
