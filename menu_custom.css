@@ -1,0 +1,54 @@
+/* ------------------- MENU EDITABLE ------------------- */
+#menu-editable {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  width: 250px;
+  background-color: #1A1A1A; /* darkGray */
+  color: #F2F2F2; /* white */
+  font-family: Arial, sans-serif;
+  padding: 15px;
+  border-radius: 10px;
+  z-index: 1000;
+}
+
+.menu-box h3 {
+  margin-top: 0;
+  font-size: 18px;
+  text-align: center;
+}
+
+.menu-box label {
+  display: block;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.menu-box input[type="range"],
+.menu-box input[type="text"],
+.menu-box select {
+  width: 100%;
+  margin-top: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  border: none;
+  font-size: 14px;
+  background-color: #000000; /* black */
+  color: #F2F2F2; /* white */
+}
+
+.menu-box button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px;
+  background-color: #FF00E6; /* magenta */
+  color: #F2F2F2; /* white */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.menu-box button:hover {
+  background-color: #FF2AAF; /* pink */
+}
