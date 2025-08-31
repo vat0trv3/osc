@@ -1,11 +1,14 @@
+body {
+  margin: 0;
+  overflow: hidden;
+}
 
-/* --- Estilos específicos para cada botón (con tus imágenes) --- */
-/* --- Estilos generales para todos los botones --- */
+/* Estilo general de botones */
 button {
   background-color: transparent;
   border: none;
   cursor: pointer;
-  width: 15vw; /* O el tamaño relativo que prefieras, por ejemplo 10vw */
+  width: 15vw;
   height: 15vw;
   background-size: contain;
   background-repeat: no-repeat;
@@ -15,27 +18,48 @@ button {
   bottom: 0;
 }
 
-/* --- Estilos específicos para cada botón --- */
+/* Botones específicos */
 .boton-grabar {
   background-image: url('assets/b1.png');
   left: 0;
-  transform: translateX(calc(17vw - 50%)); /* Centra en la primera casilla */
+  transform: translateX(calc(17vw - 50%));
 }
 
 .boton-back {
   background-image: url('assets/b2.png');
   left: 25vw;
-  transform: translateX(calc(14.8vw - 50%)); /* Centra en la segunda casilla */
+  transform: translateX(calc(14.8vw - 50%));
 }
 
 .boton-particulas {
   background-image: url('assets/b3.png');
   left: 50vw;
-  transform: translateX(calc(13vw - 50%)); /* Centra en la tercera casilla */
+  transform: translateX(calc(13vw - 50%));
 }
 
 .boton-acordes {
   background-image: url('assets/b4.png');
   left: 75vw;
-  transform: translateX(calc(10.5vw - 50%)); /* Centra en la cuarta casilla */
+  transform: translateX(calc(10.5vw - 50%));
+}
+#drum-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background-image: url('assets/drum_icon.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none;
+  cursor: pointer;
+  opacity: 0.8;
+  z-index: 999;
+  transition: transform 0.2s ease, opacity 0.2s;
+}
+
+#drum-btn:hover {
+  transform: scale(1.1);
+  opacity: 1;
 }
