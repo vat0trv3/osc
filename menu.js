@@ -26,49 +26,47 @@ window.addEventListener('DOMContentLoaded', () => {
         <option value="oscuro">Oscuro</option>
         <option value="claro">Claro</option>
       </select>
+
+      <label>Columna 1:</label>
+      <select id="columna1-selector">
+        <option value="Em">Em</option>
+        <option value="Am">Am</option>
+        <option value="Dm">Dm</option>
+        <option value="Bm">Bm</option>
+      </select>
+
+      <label>Columna 2:</label>
+      <select id="columna2-selector">
+        <option value="Em">Em</option>
+        <option value="Am">Am</option>
+        <option value="Dm">Dm</option>
+        <option value="Bm">Bm</option>
+      </select>
+
+      <label>Columna 3:</label>
+      <select id="columna3-selector">
+        <option value="Em">Em</option>
+        <option value="Am">Am</option>
+        <option value="Dm">Dm</option>
+        <option value="Bm">Bm</option>
+      </select>
+
+      <label>Columna 4:</label>
+      <select id="columna4-selector">
+        <option value="Em">Em</option>
+        <option value="Am">Am</option>
+        <option value="Dm">Dm</option>
+        <option value="Bm">Bm</option>
+      </select>
     </div>
   `;
   document.body.appendChild(menuContainer);
-    const acordeSection = document.createElement('div');
-  acordeSection.innerHTML = `
-    <label>Columna 1:</label>
-    <select id="columna1-selector">
-      <option value="Em">Em</option>
-      <option value="Am">Am</option>
-      <option value="Dm">Dm</option>
-      <option value="Bm">Bm</option>
-    </select>
 
-    <label>Columna 2:</label>
-    <select id="columna2-selector">
-      <option value="Em">Em</option>
-      <option value="Am">Am</option>
-      <option value="Dm">Dm</option>
-      <option value="Bm">Bm</option>
-    </select>
-
-    <label>Columna 3:</label>
-    <select id="columna3-selector">
-      <option value="Em">Em</option>
-      <option value="Am">Am</option>
-      <option value="Dm">Dm</option>
-      <option value="Bm">Bm</option>
-    </select>
-
-    <label>Columna 4:</label>
-    <select id="columna4-selector">
-      <option value="Em">Em</option>
-      <option value="Am">Am</option>
-      <option value="Dm">Dm</option>
-      <option value="Bm">Bm</option>
-    </select>
-  `;
   // Actualizar tempo
   const tempoSlider = document.getElementById('tempo-slider');
   const tempoValue = document.getElementById('tempo-value');
   tempoSlider.addEventListener('input', () => {
     tempoValue.textContent = tempoSlider.value;
-    // Aquí podrías usar tempoSlider.value para ajustar el tempo en tu app
   });
 
   // Actualizar texto a dibujar
@@ -88,10 +86,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const instruccionesBtn = document.getElementById('instrucciones-btn');
   instruccionesBtn.addEventListener('click', () => {
     alert("Toca la pantalla para generar visuales. Usa los botones para cambiar modos. Puedes grabar y exportar tu sesión.");
-    
-  
-
-  document.querySelector('.menu-box').appendChild(acordeSection);
+  });
 
   // Variables globales para acordes seleccionados
   window.acordesPorColumna = ['Em', 'Am', 'Dm', 'Bm'];
@@ -108,7 +103,5 @@ window.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('columna4-selector').addEventListener('change', e => {
     window.acordesPorColumna[3] = e.target.value;
-  });
-
   });
 });
