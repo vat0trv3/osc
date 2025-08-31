@@ -6,7 +6,8 @@ let osciladorSonido, osciladorMoleculas;
 let contextoAudioActivado = false;
 let waveTypes = ['sine', 'triangle', 'square', 'saw'];
 let currentWaveIndex = 0;
-
+let drumLoop;
+let drumActivo = false;
 let mouseTouchActivo = false;
 let mouseTouchPos = { x: 0, y: 0 };
 let phrase = "VAVATOTOTRATRAVAVEVE";
@@ -139,6 +140,7 @@ class MoleculaSystem {
 function preload() {
   interfaz = loadImage("fondonegro.png");
   plano = loadImage("assets/4f.png");
+  drumLoop = loadSound('assets/drumloop.mp3'); // Ruta correcta
 }
 
 function setup() {
@@ -154,223 +156,44 @@ function setup() {
   botonAcordes = select('.boton-acordes');
   botonParticulas = select('.boton-particulas');
 
-  botonGrabar.mousePressed(() => {
-    fondoBlanco = !fondoBlanco;
-  });
+  botonGrabar.mousePressed(() => { fondoBlanco = !fondoBlanco; });
+  botonBack.mousePressed(() => { modo = 'sonido'; apagarOsciladores(); });
+  botonAcordes.mousePressed(() => { modo = 'acordes'; apagarOsciladores(); });
+  botonParticulas.mousePressed(() => { modo = 'particulas'; apagarOsciladores(); });
 
-  botonBack.mousePressed(() => {
-    modo = 'sonido';
-    apagarOsciladores();
-  });
-
-  botonAcordes.mousePressed(() => {
-    modo = 'acordes';
-    apagarOsciladores();
-  });
-
-  botonParticulas.mousePressed(() => {
-    modo = 'particulas';
-    apagarOsciladores();
-  });
-}
-
-function draw() {
-  if (fondoBlanco) {
-    background(colors.white);
-  } else {
-    background(colors.black);
-  }
-  
-  if (!fondoBlanco) {
-    image(interfaz, 0, 0, width, height);
-    image(plano, 0, 0, width, height);
-  }
-
-  dibujarGuias();
-  
-  push();
-  if(fondoBlanco){ stroke(0, 80); } else { stroke(255, 80); }
-  strokeWeight(1);
-  const limiteSuperior = height * 0.2;
-  const limiteInferior = height;
-  const alturaCuadricula = limiteInferior - limiteSuperior;
-  for (let i = 1; i < 5; i++) {
-    let y = limiteSuperior + (alturaCuadricula / 5) * i;
-    line(0, y, width, y);
-  }
-  pop();
-
-  let points;
-  if (touches.length > 0) points = touches;
-  else if (mouseTouchActivo) { mouseTouchPos.x = mouseX; mouseTouchPos.y = mouseY; points = [mouseTouchPos]; }
-  else points = [];
-
-  let limite = height * 0.8;
-  points = points.filter(p => p.y < limite);
-
-  if (modo === 'sonido') manejarParticulas(points, osciladorSonido);
-  else if (modo === 'particulas') manejarParticulas(points, null);
-  else if (modo === 'acordes') manejarMoleculas(points, osciladorMoleculas);
-
-  // Bucle para actualizar, dibujar y CONECTAR letras adicionales
-  for (let i = letterParticles.length - 1; i >= 0; i--) {
-    let m = letterParticles[i];
-    m.update();
-    m.display();
-    if (m.isDead()) {
-      letterParticles.splice(i, 1);
-      continue;
-    }
-
-    // Compara la letra actual con las otras para conectarlas
-    for (let j = i - 1; j >= 0; j--) {
-      let other = letterParticles[j];
-      let d = dist(m.pos.x, m.pos.y, other.pos.x, other.pos.y);
-      
-      if (d < 60) {
-        if (fondoBlanco) {
-          stroke(0, 50);
-        } else {
-          stroke(255, 50);
-        }
-        strokeWeight(1);
-        line(m.pos.x, m.pos.y, other.pos.x, other.pos.y);
-      }
-    }
-  }
-
-  push();
-  noStroke();
-  if(fondoBlanco){
-      fill(0,0,0,50);
-  } else {
-      fill(255,255,255,50);
-  }
-  textSize(50); textAlign(CENTER, CENTER); text('♫', notaX, notaY);
-  pop();
-}
-
-function mousePressed() { if (touches.length === 0) mouseTouchActivo = !mouseTouchActivo; }
-
-// ------------------- FUNCIONES AUX -------------------
-function manejarParticulas(points, oscilador) {
-  while (particleSystems.length < points.length) particleSystems.push(new ParticleSystem());
-  while (particleSystems.length > points.length) particleSystems.pop();
-
-  for (let i = 0; i < points.length; i++) {
-    let t = points[i];
-    let ps = particleSystems[i];
-    ps.origin.set(t.x, t.y);
-    ps.addParticle(); 
-    ps.run();
-
-    if (frameCount % 5 === 0) {
-      let nextLetter = phrase.charAt(phraseIndex);
-      letterParticles.push(new Molecula(t.x, t.y, nextLetter));
-      phraseIndex = (phraseIndex + 1) % phrase.length;
-    }
-
-    if (oscilador) {
-      let resultado = getEscalaPorSlice(t);
-      if (resultado) {
-        if (!contextoAudioActivado) { oscilador.start(); oscilador.amp(0.5); contextoAudioActivado = true; }
-        oscilador.freq(resultado.frecuencia, 0.4);
-      }
-    }
-  }
-  if (oscilador) {
-    let vol = 0.5;
-    let attackTime = 0.05;
-    if (waveTypes[currentWaveIndex] === 'saw') {
-      vol = 0.3;
-      attackTime = 1.0;
-    }
-    if (points.length === 0) {
-      oscilador.amp(0, 0.05);
+  select('#drum-btn').mousePressed(() => {
+    if (!drumLoop.isPlaying()) {
+      drumLoop.loop();
+      drumActivo = true;
     } else {
-      oscilador.amp(vol, attackTime);
+      drumLoop.stop();
+      drumActivo = false;
     }
-  }
-}
+  });
 
-function manejarMoleculas(points, oscilador) {
-  while (moleculaSystems.length < points.length) moleculaSystems.push(new MoleculaSystem());
-  while (moleculaSystems.length > points.length) moleculaSystems.pop();
-
-  for (let i = 0; i < points.length; i++) {
-    let t = points[i];
-    let ms = moleculaSystems[i];
-    ms.origin.set(t.x, t.y);
-
-    let nextLetter = phrase.charAt(phraseIndex);
-    ms.addMolecula(nextLetter);
-    phraseIndex = (phraseIndex + 1) % phrase.length;
-    ms.run();
-
-    if (oscilador) {
-      let resultado = getEscalaPorSlice(t);
-      if (resultado) {
-        if (!contextoAudioActivado) { oscilador.start(); oscilador.amp(0.5); contextoAudioActivado = true; }
-        oscilador.freq(resultado.frecuencia, 0.4);
-      }
+  setInterval(() => {
+    const btn = select('#drum-btn');
+    if (drumActivo) {
+      btn.style('border-color', '#ff00aa');
+      btn.style('color', '#ff00aa');
+    } else {
+      btn.style('border-color', '#00ffff');
+      btn.style('color', '#00ffff');
     }
-  }
-  if (oscilador) {
-    if (points.length === 0) oscilador.amp(0, 0.05);
-    else oscilador.amp(0.5, 0.05);
-  }
+  }, 300);
 }
 
-function apagarOsciladores() {
-  osciladorSonido.amp(0, 0.05);
-  osciladorMoleculas.amp(0, 0.05);
-  contextoAudioActivado = false;
-  letterParticles = [];
-}
-
-// ------------------- COLUMNAS / ESCALAS -------------------
-function getEscalaPorSlice(puntoToque) {
-  const limiteSuperior = height * 0.2;
-  const limiteInferior = height;
-
-  let anchoColumna = width / 4;
-  let columna = floor(puntoToque.x / anchoColumna);
-
-  const escalasVertical = {
-    'Em': [329.63, 392.00, 440.00, 493.88, 587.33],
-    'Am': [440.00, 523.25, 587.33, 659.26, 783.99],
-    'Dm': [293.66, 349.23, 392.00, 440.00, 523.25],
-    'Bm': [493.88, 587.33, 659.26, 739.99, 880.00]
-  };
-
-  let escalaSeleccionada;
-  if (columna === 0) escalaSeleccionada = 'Em';
-  else if (columna === 1) escalaSeleccionada = 'Am';
-  else if (columna === 2) escalaSeleccionada = 'Dm';
-  else if (columna === 3) escalaSeleccionada = 'Bm';
-  else return null;
-
-  let notas = escalasVertical[escalaSeleccionada];
-  let indice = floor(map(puntoToque.y, limiteSuperior, limiteInferior, 0, notas.length));
-  indice = constrain(indice, 0, notas.length - 1);
-
-  return { escala: escalaSeleccionada, frecuencia: notas[indice] };
-}
-
-function dibujarGuias() {
-  push();
-  strokeWeight(1.5);
-  drawingContext.setLineDash([10, 10]);
-  stroke(255, 0, 230, 40);
-  let anchoColumna = width / 4;
-  for (let i = 1; i < 4; i++) {
-    let x = i * anchoColumna;
-    line(x, 0, x, height);
+function updateDrumButton() {
+  const btn = select('#drum-btn');
+  if (drumActivo) {
+    btn.style('filter', 'drop-shadow(0 0 10px #00ffff)');
+  } else {
+    btn.style('filter', 'none');
   }
-  drawingContext.setLineDash([]);
-  pop();
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
+
+
