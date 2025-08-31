@@ -1,8 +1,10 @@
-// ------------------- MENU EDITABLE -------------------
+
 window.addEventListener('DOMContentLoaded', () => {
+  // Crear menú
   const menuContainer = document.createElement('div');
   menuContainer.id = 'menu-editable';
   menuContainer.innerHTML = `
+    <button class="close-btn">X</button>
     <div class="menu-box">
       <h3>Configuración</h3>
 
@@ -27,6 +29,7 @@ window.addEventListener('DOMContentLoaded', () => {
         <option value="claro">Claro</option>
       </select>
 
+      <!-- Acordes -->
       <label>Columna 1:</label>
       <select id="columna1-selector">
         <option value="Em">Em</option>
@@ -62,46 +65,47 @@ window.addEventListener('DOMContentLoaded', () => {
   `;
   document.body.appendChild(menuContainer);
 
-  // Actualizar tempo
+  // Abrir menú
+  const openBtn = document.getElementById('open-menu-btn');
+  openBtn.addEventListener('click', () => {
+    menuContainer.style.display = 'block';
+    openBtn.style.display = 'none';
+  });
+
+  // Cerrar menú
+  const closeBtn = menuContainer.querySelector('.close-btn');
+  closeBtn.addEventListener('click', () => {
+    menuContainer.style.display = 'none';
+    openBtn.style.display = 'block';
+  });
+
+  // === Resto de tus listeners ===
   const tempoSlider = document.getElementById('tempo-slider');
   const tempoValue = document.getElementById('tempo-value');
   tempoSlider.addEventListener('input', () => {
     tempoValue.textContent = tempoSlider.value;
   });
 
-  // Actualizar texto a dibujar
   const textoInput = document.getElementById('texto-input');
   textoInput.addEventListener('input', () => {
     window.phrase = textoInput.value || "VAVATOTOTRATRAVAVEVE";
     window.phraseIndex = 0;
   });
 
-  // Cambiar tema visual
   const temaSelector = document.getElementById('tema-selector');
   temaSelector.addEventListener('change', () => {
     window.fondoBlanco = temaSelector.value === 'claro';
   });
 
-  // Mostrar instrucciones
   const instruccionesBtn = document.getElementById('instrucciones-btn');
   instruccionesBtn.addEventListener('click', () => {
     alert("Toca la pantalla para generar visuales. Usa los botones para cambiar modos. Puedes grabar y exportar tu sesión.");
   });
 
-  // Variables globales para acordes seleccionados
   window.acordesPorColumna = ['Em', 'Am', 'Dm', 'Bm'];
-
-  // Listeners para actualizar acordes
-  document.getElementById('columna1-selector').addEventListener('change', e => {
-    window.acordesPorColumna[0] = e.target.value;
-  });
-  document.getElementById('columna2-selector').addEventListener('change', e => {
-    window.acordesPorColumna[1] = e.target.value;
-  });
-  document.getElementById('columna3-selector').addEventListener('change', e => {
-    window.acordesPorColumna[2] = e.target.value;
-  });
-  document.getElementById('columna4-selector').addEventListener('change', e => {
-    window.acordesPorColumna[3] = e.target.value;
+  ['columna1','columna2','columna3','columna4'].forEach((id,i)=>{
+    document.getElementById(`${id}-selector`).addEventListener('change', e=>{
+      window.acordesPorColumna[i] = e.target.value;
+    });
   });
 });
