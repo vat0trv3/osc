@@ -173,8 +173,8 @@ function preload() {
   plano = loadImage("assets/4f.png");
   soundFormats('mp3', 'wav'); // por si usas .wav después
   drumLoops[0] = loadSound('assets/audio/KesiKenobyvattdrumsversioncorta.wav');
-  drumLoops[1] = loadSound('assets/audio/KesiKenobyvattdrumsversioncorta.wav');
-  drumLoops[2] = loadSound('assets/audio/KesiKenobyvattdrumsversioncorta.wav');
+  drumLoops[1] = loadSound('');
+  drumLoops[2] = loadSound('');
 }
 function setup() {
   let canvas = createCanvas(windowWidth, windowHeight);
