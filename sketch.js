@@ -1,5 +1,5 @@
-let drumLoops = [];
-let currentLoop = -1;
+let drumLoop;
+let drumPlaying = false;
 let drumBtn;
 let interfaz, plano;
 
@@ -172,9 +172,7 @@ function preload() {
   interfaz = loadImage("fondonegro.png");
   plano = loadImage("assets/4f.png");
   soundFormats('mp3', 'wav'); // por si usas .wav después
-  drumLoops[0] = loadSound('assets/audio/KesiKenobyvattdrumsversioncorta.wav');
-  drumLoops[1] = loadSound('');
-  drumLoops[2] = loadSound('');
+  drumLoop = loadSound('assets/audio/KesiKenobyvattdrumsversioncorta.wav');
 }
 function setup() {
   let canvas = createCanvas(windowWidth, windowHeight);
@@ -232,9 +230,9 @@ notaY = 60;
   });
 }
 function draw() {
-  if (fondoBlanco); 
+  if (fondoBlanco) {
     background(fondoBlanco ? colors.white : colors.black);
-
+}
   // ... lo que ya tienes ...
   dibujarTablero();
 // Mostrar interfaz solo en fondo oscuro
@@ -305,14 +303,13 @@ pop();
     }
   }
 function toggleDrumLoop() {
-  // Detener loop actual si hay uno
-  if (currentLoop !== -1 && drumLoops[currentLoop].isPlaying()) {
-    drumLoops[currentLoop].stop();
+  if (drumPlaying) {
+    drumLoop.stop();
+    drumPlaying = false;
+  } else {
+    drumLoop.loop();
+    drumPlaying = true;
   }
-
-  // Avanzar al siguiente loop
-  currentLoop = (currentLoop + 1) % drumLoops.length;
-  drumLoops[currentLoop].loop();
 }
   push();
   noStroke();
